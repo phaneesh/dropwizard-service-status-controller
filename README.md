@@ -1,4 +1,4 @@
-# Dropwizard Status COntroller Bundle
+# Dropwizard Status Controller Bundle
 
 This bundle adds This bundle adds status control to your drop wizard application which allows one 
 to control the availability of the service. This will ensure that the service remains in
