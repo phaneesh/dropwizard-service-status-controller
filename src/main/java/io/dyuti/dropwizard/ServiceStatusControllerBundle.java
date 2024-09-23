@@ -23,10 +23,8 @@ import io.dyuti.dropwizard.core.ServiceState;
 import io.dyuti.dropwizard.status.StatusControllerFilter;
 import io.dyuti.dropwizard.tasks.GetServiceStateTask;
 import java.util.function.Supplier;
-import lombok.extern.slf4j.Slf4j;
 
 /** Bundle that allows controlling service availability status */
-@Slf4j
 public abstract class ServiceStatusControllerBundle<T extends Configuration>
     implements ConfiguredBundle<T> {
 
