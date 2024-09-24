@@ -9,7 +9,7 @@ import java.util.function.Supplier;
 
 public class GetServiceStateTask extends Task {
 
-  private Supplier<ServiceState> stateSupplier;
+  private final Supplier<ServiceState> stateSupplier;
 
   public GetServiceStateTask(Supplier<ServiceState> stateSupplier) {
     super("service-state");

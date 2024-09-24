@@ -20,6 +20,7 @@ import io.dropwizard.ConfiguredBundle;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import io.dyuti.dropwizard.core.ServiceState;
+import io.dyuti.dropwizard.listener.ServiceStateChangeListener;
 import io.dyuti.dropwizard.status.StatusControllerFilter;
 import io.dyuti.dropwizard.tasks.GetServiceStateTask;
 import java.util.function.Supplier;
@@ -37,7 +38,8 @@ public abstract class ServiceStatusControllerBundle<T extends Configuration>
         .jersey()
         .register(
             new StatusControllerFilter(
-                stateSupplier(), initDelaySeconds(configuration), delaySeconds(configuration)));
+                stateSupplier(), initDelaySeconds(configuration), delaySeconds(configuration),
+            stateChangeListener()));
     environment.admin().addTask(new GetServiceStateTask(stateSupplier()));
   }
 
@@ -46,4 +48,6 @@ public abstract class ServiceStatusControllerBundle<T extends Configuration>
   public abstract int initDelaySeconds(T configuration);
 
   public abstract int delaySeconds(T configuration);
+
+  public abstract ServiceStateChangeListener stateChangeListener();
 }
