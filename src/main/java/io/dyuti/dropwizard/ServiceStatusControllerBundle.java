@@ -43,7 +43,7 @@ public abstract class ServiceStatusControllerBundle<T extends Configuration>
 
   public abstract Supplier<ServiceState> stateSupplier();
 
-  public abstract int initDelaySeconds(Configuration configuration);
+  public abstract int initDelaySeconds(T configuration);
 
-  public abstract int delaySeconds(Configuration configuration);
+  public abstract int delaySeconds(T configuration);
 }
