@@ -1,8 +1,7 @@
 package io.dyuti.dropwizard.status;
 
+import io.dyuti.dropwizard.ServiceStatusControllerBundle;
 import io.dyuti.dropwizard.core.ServiceState;
-import io.dyuti.dropwizard.listener.ServiceStateChangeListener;
-import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -24,22 +23,20 @@ public class StatusControllerFilter implements ContainerRequestFilter {
 
   private final Supplier<ServiceState> stateSupplier;
 
-  private final ServiceStateChangeListener stateChangeListener;
-
   public StatusControllerFilter(
       Supplier<ServiceState> stateSupplier,
       int initDelaySeconds,
-      int delaySeconds,
-      ServiceStateChangeListener stateChangeListener) {
+      int delaySeconds) {
     this.stateSupplier = stateSupplier;
     this.serviceState = new AtomicReference<>(this.stateSupplier.get());
-    this.stateChangeListener = stateChangeListener;
     ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
     executor.scheduleWithFixedDelay(
         () -> {
           var oldState = serviceState.getAndSet(this.stateSupplier.get());
-          if (oldState != serviceState.get() && Objects.nonNull(stateChangeListener)) {
-            this.stateChangeListener.stateChanged(oldState, serviceState.get());
+          if (oldState != serviceState.get() && !ServiceStatusControllerBundle.getStateChangeListeners()
+              .isEmpty()) {
+            ServiceStatusControllerBundle.getStateChangeListeners()
+                .forEach(listener -> listener.stateChanged(oldState, serviceState.get()));
           }
         },
         initDelaySeconds,

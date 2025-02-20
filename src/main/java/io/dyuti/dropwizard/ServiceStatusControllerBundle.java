@@ -23,14 +23,22 @@ import io.dyuti.dropwizard.core.ServiceState;
 import io.dyuti.dropwizard.listener.ServiceStateChangeListener;
 import io.dyuti.dropwizard.status.StatusControllerFilter;
 import io.dyuti.dropwizard.tasks.GetServiceStateTask;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.function.Supplier;
 
-/** Bundle that allows controlling service availability status */
+/**
+ * Bundle that allows controlling service availability status
+ */
 public abstract class ServiceStatusControllerBundle<T extends Configuration>
     implements ConfiguredBundle<T> {
 
+  private static final Set<ServiceStateChangeListener> listeners = new HashSet<>();
+
   @Override
-  public void initialize(Bootstrap<?> bootstrap) {}
+  public void initialize(Bootstrap<?> bootstrap) {
+
+  }
 
   @Override
   public void run(T configuration, Environment environment) {
@@ -38,8 +46,7 @@ public abstract class ServiceStatusControllerBundle<T extends Configuration>
         .jersey()
         .register(
             new StatusControllerFilter(
-                stateSupplier(), initDelaySeconds(configuration), delaySeconds(configuration),
-            stateChangeListener()));
+                stateSupplier(), initDelaySeconds(configuration), delaySeconds(configuration)));
     environment.admin().addTask(new GetServiceStateTask(stateSupplier()));
   }
 
@@ -49,5 +56,15 @@ public abstract class ServiceStatusControllerBundle<T extends Configuration>
 
   public abstract int delaySeconds(T configuration);
 
-  public abstract ServiceStateChangeListener stateChangeListener();
+  public final void registerStateChangeListener(ServiceStateChangeListener listener) {
+    listeners.add(listener);
+  }
+
+  public static Set<ServiceStateChangeListener> getStateChangeListeners() {
+    return listeners;
+  }
+
+  public ServiceState getCurrentServiceState() {
+    return stateSupplier().get();
+  }
 }

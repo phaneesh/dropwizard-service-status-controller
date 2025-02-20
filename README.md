@@ -37,11 +37,14 @@ to the service will return 503 if the service is made unavailable.
 #### Bootstrap
 
 ```java
-    import io.dyuti.dropwizard.listener.ServiceStateChangeListener;
+    import io.dyuti.dropwizard.core.ServiceState;
+import io.dyuti.dropwizard.listener.ServiceStateChangeListener;
+
+ServiceStatusControllerBundle<Configuration> stateControllerBundle;
 
 @Override
 public void initialize(final Bootstrap bootstrap) {
-  bootstrap.addBundle(new ServiceStatusControllerBundle<Configuration>() {
+  stateControllerBundle = new ServiceStatusControllerBundle<Configuration>() {
 
     public int initDelaySeconds(MyAppConfiguration configuration) {
       return configuration.getServiceStatusControllerConfiguration().getInitDelaySeconds();
@@ -59,12 +62,20 @@ public void initialize(final Bootstrap bootstrap) {
         return ServiceStateMonitor.currentState();
       }
     }
+  };
+  bootstrap.addBundle(stateControllerBundle);
+}
 
-    public ServiceStateChangeListener stateChangeListener() {
-      return (ServiceState state) -> {
-        someManagedResource.stop();
-      };
-    }
+@Override
+public void run(final MyAppConfiguration configuration, final Environment environment) {
+  //Register a listener to get notified when the service state changes
+  stateControllerBundle.registerListener((ServiceStateChangeListener) (oldState, newState) -> {
+    //Your logic to handle the state change
   });
+
+  //Call getCurrentServiceState to get the current state of the service
+  if(stateControllerBundle.getCurrentServiceState() == ServiceState.AVAILABLE){
+    //Your logic to handle the service being available
+  }
 }
 ```
