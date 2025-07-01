@@ -2,17 +2,17 @@ package io.dyuti.dropwizard.status;
 
 import io.dyuti.dropwizard.ServiceStatusControllerBundle;
 import io.dyuti.dropwizard.core.ServiceState;
+import jakarta.annotation.Priority;
+import jakarta.inject.Singleton;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerRequestFilter;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.ext.Provider;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
-import javax.annotation.Priority;
-import javax.inject.Singleton;
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.Provider;
 
 @Singleton
 @Provider
@@ -29,20 +29,22 @@ public class StatusControllerFilter implements ContainerRequestFilter {
       int delaySeconds) {
     this.stateSupplier = stateSupplier;
     this.serviceState = new AtomicReference<>(this.stateSupplier.get());
-    ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
-    executor.scheduleWithFixedDelay(
-        () -> {
-          var oldState = serviceState.getAndSet(this.stateSupplier.get());
-          if (oldState != serviceState.get() && !ServiceStatusControllerBundle.getStateChangeListeners()
-              .isEmpty()) {
-            ServiceStatusControllerBundle.getStateChangeListeners()
-                .forEach(listener -> listener.stateChanged(oldState, serviceState.get()));
-          }
-        },
-        initDelaySeconds,
-        delaySeconds,
-        TimeUnit.SECONDS);
-    Runtime.getRuntime().addShutdownHook(new Thread(executor::shutdown));
+    try (ScheduledExecutorService executor = Executors.newScheduledThreadPool(1)) {
+      executor.scheduleWithFixedDelay(
+          () -> {
+            var oldState = serviceState.getAndSet(this.stateSupplier.get());
+            if (oldState != serviceState.get()
+                && !ServiceStatusControllerBundle.getStateChangeListeners()
+                .isEmpty()) {
+              ServiceStatusControllerBundle.getStateChangeListeners()
+                  .forEach(listener -> listener.stateChanged(oldState, serviceState.get()));
+            }
+          },
+          initDelaySeconds,
+          delaySeconds,
+          TimeUnit.SECONDS);
+      Runtime.getRuntime().addShutdownHook(new Thread(executor::shutdown));
+    }
   }
 
   @Override

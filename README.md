@@ -7,6 +7,7 @@ when setup in Active-Passive mode.
 If the status is set to UNAVAILABLE all the calls to the application will send a 
 503 Service Unavailable. Once the service state is set to AVAILABLE the service will start serving requests.
 
+Java 21 is required to compile this bundle.
 
 ## Usage
 This bundle makes it simple to control the availability of the service. 
@@ -28,7 +29,7 @@ to the service will return 503 if the service is made unavailable.
 <dependency>
     <groupId>io.dyuti</groupId>
     <artifactId>dropwizard-service-status-controller</artifactId>
-    <version>2.1.12-3</version>
+    <version>5.0.0-rc.3-1</version>
 </dependency>
 ```
 

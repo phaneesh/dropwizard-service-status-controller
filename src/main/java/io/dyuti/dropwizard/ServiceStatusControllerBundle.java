@@ -15,10 +15,10 @@
  */
 package io.dyuti.dropwizard;
 
-import io.dropwizard.Configuration;
-import io.dropwizard.ConfiguredBundle;
-import io.dropwizard.setup.Bootstrap;
-import io.dropwizard.setup.Environment;
+import io.dropwizard.core.Configuration;
+import io.dropwizard.core.ConfiguredBundle;
+import io.dropwizard.core.setup.Bootstrap;
+import io.dropwizard.core.setup.Environment;
 import io.dyuti.dropwizard.core.ServiceState;
 import io.dyuti.dropwizard.listener.ServiceStateChangeListener;
 import io.dyuti.dropwizard.status.StatusControllerFilter;

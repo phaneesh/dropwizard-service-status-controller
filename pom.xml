@@ -5,7 +5,7 @@
 
   <groupId>io.dyuti</groupId>
   <artifactId>dropwizard-service-status-controller</artifactId>
-  <version>2.1.12-4</version>
+  <version>5.0.0-rc.3-1</version>
   <packaging>jar</packaging>
 
   <name>dropwizard-service-status-controller</name>
@@ -49,17 +49,48 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <dropwizard.version>2.1.12</dropwizard.version>
-    <maven.compiler.source>17</maven.compiler.source>
-    <maven.compiler.target>17</maven.compiler.target>
-    <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
+    <dropwizard.version>5.0.0-rc.3</dropwizard.version>
+    <lombok.version>1.18.38</lombok.version>
+    <guava.version>33.4.8-jre</guava.version>
+    <maven.compiler.source>21</maven.compiler.source>
+    <maven.compiler.target>21</maven.compiler.target>
+    <maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
+    <maven-enforcer-plugin.version>3.5.0</maven-enforcer-plugin.version>
+    <central-publishing-maven-plugin.version>0.8.0</central-publishing-maven-plugin.version>
+    <maven-source-plugin.version>3.3.1</maven-source-plugin.version>
+    <maven-javadoc-plugin.version>3.11.2</maven-javadoc-plugin.version>
+    <maven-gpg-plugin.version>3.2.7</maven-gpg-plugin.version>
   </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>io.dropwizard</groupId>
+        <artifactId>dropwizard-bom</artifactId>
+        <type>pom</type>
+        <scope>import</scope>
+        <version>${dropwizard.version}</version>
+      </dependency>
+      <!-- Dropwizard Dependencies for transitive deps like hibernate-core -->
+      <dependency>
+        <groupId>io.dropwizard</groupId>
+        <artifactId>dropwizard-dependencies</artifactId>
+        <type>pom</type>
+        <scope>import</scope>
+        <version>${dropwizard.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.google.guava</groupId>
+        <artifactId>guava</artifactId>
+        <version>${guava.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <dependencies>
     <dependency>
       <groupId>io.dropwizard</groupId>
       <artifactId>dropwizard-core</artifactId>
-      <version>${dropwizard.version}</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>
@@ -74,12 +105,23 @@
           <source>${maven.compiler.source}</source>
           <target>${maven.compiler.target}</target>
           <release>${maven.compiler.source}</release>
+          <annotationProcessors>
+            <annotationProcessor>lombok.launch.AnnotationProcessorHider$AnnotationProcessor
+            </annotationProcessor>
+          </annotationProcessors>
+          <annotationProcessorPaths>
+            <annotationProcessorPath>
+              <groupId>org.projectlombok</groupId>
+              <artifactId>lombok</artifactId>
+              <version>${lombok.version}</version>
+            </annotationProcessorPath>
+          </annotationProcessorPaths>
         </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
-        <version>3.5.0</version>
+        <version>${maven-enforcer-plugin.version}</version>
         <executions>
           <execution>
             <id>enforce-no-snapshots</id>
@@ -100,7 +142,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
-        <version>3.3.1</version>
+        <version>${maven-source-plugin.version}</version>
         <executions>
           <execution>
             <id>attach-sources</id>
@@ -113,9 +155,9 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>3.11.2</version>
+        <version>${maven-javadoc-plugin.version}</version>
         <configuration>
-          <source>17</source>
+          <source>21</source>
         </configuration>
         <executions>
           <execution>
@@ -129,7 +171,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-gpg-plugin</artifactId>
-        <version>3.2.7</version>
+        <version>${maven-gpg-plugin.version}</version>
         <executions>
           <execution>
             <id>sign-artifacts</id>
@@ -150,7 +192,7 @@
       <plugin>
         <groupId>org.sonatype.central</groupId>
         <artifactId>central-publishing-maven-plugin</artifactId>
-        <version>0.7.0</version>
+        <version>${central-publishing-maven-plugin.version}</version>
         <extensions>true</extensions>
         <configuration>
           <publishingServerId>central</publishingServerId>
