@@ -29,7 +29,7 @@ to the service will return 503 if the service is made unavailable.
 <dependency>
     <groupId>io.dyuti</groupId>
     <artifactId>dropwizard-service-status-controller</artifactId>
-    <version>5.0.0-rc.3-1</version>
+    <version>5.0.0-1</version>
 </dependency>
 ```
 
